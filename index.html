@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chaos Simulation</title>
+    <title>Triple Pendulum</title>
     <style>
         body {
             margin: 0;
@@ -20,7 +20,68 @@
     </style>
 </head>
 <body>
-    <script src="p5.js"></script>
-    <script src="sketch.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script>
+        let len1 = 100;
+        let len2 = 100;
+        let len3 = 100;
+        let angle1 = Math.PI / 4;
+        let angle2 = Math.PI / 4;
+        let angle3 = Math.PI / 4;
+        let angleVel1 = 0;
+        let angleVel2 = 0;
+        let angleVel3 = 0;
+        let g = 1;
+
+        function setup() {
+            createCanvas(600, 600);
+        }
+
+        function draw() {
+            background(0);
+            translate(width / 2, height / 4);
+
+            let x1 = len1 * sin(angle1);
+            let y1 = len1 * cos(angle1);
+
+            let x2 = x1 + len2 * sin(angle2);
+            let y2 = y1 + len2 * cos(angle2);
+
+            let x3 = x2 + len3 * sin(angle3);
+            let y3 = y2 + len3 * cos(angle3);
+
+            // Draw pendulum arms
+            stroke(255);
+            strokeWeight(2);
+            line(0, 0, x1, y1);
+            line(x1, y1, x2, y2);
+            line(x2, y2, x3, y3);
+
+            // Draw pendulum bobs
+            fill(255);
+            ellipse(x1, y1, 20, 20);
+            ellipse(x2, y2, 20, 20);
+            ellipse(x3, y3, 20, 20);
+
+            // Update angular velocities and angles using Verlet integration
+            let numIterations = 10;
+            for (let i = 0; i < numIterations; i++) {
+                let num1 = -g * (2 * len1 * sin(angle1) + len2 * sin(angle2 - angle1) + len3 * sin(angle3 - angle1));
+                let den1 = len1 * (2 * len1 - len2 * cos(2 * angle2 - 2 * angle1) - len3 * cos(2 * angle3 - 2 * angle1));
+                let num2 = 2 * sin(angle2 - angle1) * (g * (len1 * (len1 - len2) + len3 * len2 * cos(angle2 - angle3)));
+                let den2 = len2 * (2 * len1 - len2 * cos(2 * angle2 - 2 * angle1) - len3 * cos(2 * angle3 - 2 * angle1));
+                let num3 = 2 * sin(angle3 - angle1) * (g * (len1 * (len1 - len3) - len2 * len3 * cos(angle2 - angle3)));
+                let den3 = len3 * (2 * len1 - len2 * cos(2 * angle2 - 2 * angle1) - len3 * cos(2 * angle3 - 2 * angle1));
+
+                angleVel1 += (num1 / den1) * (1 / numIterations);
+                angleVel2 += (num2 / den2) * (1 / numIterations);
+                angleVel3 += (num3 / den3) * (1 / numIterations);
+
+                angle1 += angleVel1 * (1 / numIterations);
+                angle2 += angleVel2 * (1 / numIterations);
+                angle3 += angleVel3 * (1 / numIterations);
+            }
+        }
+    </script>
 </body>
 </html>
