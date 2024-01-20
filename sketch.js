@@ -7,21 +7,25 @@ let y = 0.01;
 let z = 0.01;
 
 let dt = 0.005;
+let speedSlider;
 
 let dx, dy, dz;
-
-// dx/dt = sigma * (y - x)
-// dy/dt = x * (rho - z) - y
-// dz/dt = x * y - beta * z
 
 // show history
 let history = [];
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
+    
+    // Create a slider for controlling the speed
+    speedSlider = createSlider(0.001, 0.02, dt, 0.001);
+    speedSlider.position(10, 10);
 }
 
 function draw() {
+    // Set dt based on the slider value
+    dt = speedSlider.value();
+    
     colorMode(RGB);
     background(0);
     colorMode(HSB);
@@ -45,8 +49,6 @@ function draw() {
         let c = color(map(i, 0, history.length, 0, 360), 100, 100);
 
         stroke(c);
-        // point(v.x, v.y);
         line(p.x, p.y, v.x, v.y);
     }
-
 }
